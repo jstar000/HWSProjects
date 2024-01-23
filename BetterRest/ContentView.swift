@@ -5,24 +5,85 @@
 //  Created by 임지성 on 1/22/24.
 //
 
+import CoreML //보통 여러 개 import할 때는 알파벳 순서로 import
 import SwiftUI
 
 struct ContentView: View {
-    @State private var sleepAmount = 8.0
-    @State private var wakeUp = Date.now
+    static var defaultWakeUpTime: Date {
+        var component = DateComponents()
+        component.hour = 7
+        component.minute = 0
+        return Calendar.current.date(from: component) ?? Date.now
+    }
+    
+    @State private var sleepAmount = 8.0 //얼마나 자고싶은지
+    @State private var wakeUp = defaultWakeUpTime //언제 일어나고싶은지
+    @State private var coffeeAmount = 1 //하루에 커피를 얼마나 마시고싶은지
+    
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
+    @State private var showingAlert = false
     
     var body: some View {
-        Stepper("\(sleepAmount.formatted()) hours", value: $sleepAmount, in: 4...12, step: 0.25)
-        //formatted()는 검색해도 안나오는데 일단 여기서는 double형태의 실수 뒤에 붙는 소수점 0들 없애는 역할
-        //in은 stepper의 범위, step은 +- 한 번 누를 때 얼마나 증가감소할지
-        DatePicker("Please enter a date", selection: $wakeUp, in: Date.now..., displayedComponents: .hourAndMinute)
-            .labelsHidden()
-        //in은 stepper의 in과 마찬가지로 날짜 범위 설정하는거
-        //displayedComponent를 설정하지 않으면 연월일시간 모두 뜨고, 설정하면 거기 시간만 뜨게 할건지 연월일만 뜨게 할건지 선택할 수 있음
-        //labelsHidden()은 "Please enter a date"를 보이지 않게 함. VoiceOver가 되려면 저기 뭘 적긴 적어야
-        //하는데 보이게 하고싶지 않다면 labelsHidden() 사용하면 됨
-        //labelsHidden()은 DatePicker말고 위에 Stepper에도 사용할 수 있고 UI(여기서는 연월일과 시간 선택 버튼,
-        //Stepper에서는 +-버튼 등)와 텍스트가 따로 분리된 형태에서 사용할 수 있는 modifier임
+        NavigationStack {
+            VStack {
+                Text("When do you want to wake up?")
+                    .font(.headline)
+                
+                DatePicker("Please enter a time", selection: $wakeUp, displayedComponents: .hourAndMinute)
+                    .labelsHidden()
+                //언제 일어나고 싶은지 날짜가 아니라 '시간'이 궁금하므로 .hourAndMinute 선택
+                
+                Text("Desired amount of sleep")
+                    .font(.headline)
+                
+                Stepper("\(sleepAmount.formatted()) hours", value: $sleepAmount, in: 4...12, step: 0.25)
+                
+                Text("Daily coffee intake")
+                    .font(.headline)
+                
+                Stepper("\(coffeeAmount) cup(s)", value: $coffeeAmount, in: 1...20)
+            }
+            .navigationTitle("BetterRest")
+            .toolbar {
+                Button("Calculate", action: calculateBedTime)
+            }
+            .alert(alertTitle, isPresented: $showingAlert) {
+                Button("OK") {}
+            } message: {
+                Text(alertMessage)
+            }
+        }
+    }
+    
+    func calculateBedTime() {
+        do {
+            //코드 진행 설명은 노션 Project4 참고
+            let config = MLModelConfiguration()
+            let model = try SleepCalculator(configuration: config)
+            //1. SleepCalculator클래스의 인스턴스 생성하기(configuration은 '구성'이라는 뜻)
+            //-> 이 모델 인스턴스로 데이터를 읽은 후 예측 데이터를 만들 수 있음
+            //do-catch문은 Core ML이 두 군데서 에러를 만들 수 있으므로 사용
+            //-> model을 load할 때와(바로 위 코드), 예측 데이터를 만들 때
+            
+            let components = Calendar.current.dateComponents([.hour, .minute], from: wakeUp)
+            //여기서 [.hour, .minute]이라는 건, dateComponent에는 year, month, day, hour, minute, second, timezone 등 다양한 component가 있는데 거기서 hour와 minute component를 얻어오겠다는 의미로 사용되는 듯!
+            let hour = (components.hour ?? 0) * 60 * 60
+            let minute = (components.minute ?? 0) * 60
+            
+            let prediction = try model.prediction(wake: Double(hour + minute), estimatedSleep: sleepAmount, coffee: Double(coffeeAmount))
+            //여기서 Core ML 알고리즘을 통해 계산됨
+            let sleepTime = wakeUp - prediction.actualSleep
+            //wakeUp의 자료형은 Date인데, Date에서 초단위 값인 prediction.actualSleep을 빼면 결과는 그냥 Date형으로 자동 계산됨
+            alertTitle = "Your ideal bedtime is..."
+            alertMessage = sleepTime.formatted(date: .omitted, time: .shortened)
+            //sleepTime은 string이 아니라 Date이므로 이걸 .formatted()를 통해 적절히 변환해야 함(코드에 대한 자세한 설명은 없음)
+        } catch {
+            alertTitle = "Error"
+            alertMessage = "Sorry, there was a problem calculating your bedtime"
+        }
+        
+        showingAlert = true
     }
 }
 
