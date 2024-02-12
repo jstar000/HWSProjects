@@ -12,9 +12,7 @@ struct ContentView: View {
     @State private var rootWord = "" //root word for them to spell other words from
     @State private var newWord = "" //text field에 바인딩할 string
     
-    var wordsArray = [String]()
-    
-    //에러 알림용c
+    //에러 알림용
     @State private var errorTitle = ""
     @State private var errorMessage = ""
     @State private var showingError = false
@@ -38,20 +36,16 @@ struct ContentView: View {
                     }
                 }
             }
-            .listStyle(.grouped)
             .navigationTitle(rootWord)
             .onSubmit(addNewWord)
             //사용자가 키보드에서 return을 누르면 addNewWord()를 실행하고 싶음. 이럴 때는 onSubmit() modifier를 view hierarchy 어딘가에 추가하면 됨(버튼에 직접적으로 붙일 수도 있는데, 사실 상 그냥 뷰의 어디에든 추가하면 됨(어떤 text가 submitted되든 onSubmit()가 실행됨))
             //onSubmit()는 아무런 파라미터도 없고 어떤 것도 리턴하지 않는 함수를 인자로 받음
-            .onAppear(perform: getWordsArray)
+            .onAppear(perform: startGame)
             .alert(errorTitle, isPresented: $showingError) {
                 //Button("OK") {}
                 //alert에 아무런 버튼도 선언하지 않으면 자동으로 alert를 dismiss하게 만드는 "OK"버튼이 생성됨
             } message: {
                 Text(errorMessage)
-            }
-            .toolbar {
-                Button("Restart", action: restartGame)
             }
         }
     }
@@ -64,11 +58,6 @@ struct ContentView: View {
         guard answer.count > 0 else { return }
         //guard문은 guard let result = variable else { return } 이렇게 unwrap할 때만 사용하는게 아니라 어떤 condition에도 사용할 수 있음
         //여기서도 answer.count > 0, 즉 answer배열이 빈 배열이 아닌 경우 다음 코드로 넘어가고, guard문의 조건을 만족하지 않는 경우 else구문이 실행되어 종료됨
-        
-        guard wordLimit(word: answer) else {
-            wordError(title: "Word does not fit standard", message: "Do not use words that are shorter than 3 letters, or are just same as our root word")
-            return
-        }
         
         guard isOriginal(word: answer) else {
             wordError(title: "Word used already", message: "Be more original")
@@ -85,6 +74,11 @@ struct ContentView: View {
             return
         }
         
+        guard checkLength(word: answer) else {
+            wordError(title: "Word shorter than 3 letters or is same as our start word", message: "Make your word longer than 3 letters or different from our start word")
+            return
+        }
+        
         //usedWords배열의 0번째 element에 answer라는 string을 삽입함
         withAnimation {
             usedWords.insert(answer, at: 0)
@@ -96,26 +90,25 @@ struct ContentView: View {
         newWord = ""
     }
     
-    func getWordsArray() {
+    func startGame() {
         //1. app bundle에서 start.txt의 URL 찾기
         //여러가지 bundle들 중 main bundle에 접근하고 싶다면 Bundle.main.url() 사용
         if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: "txt") {
             //2. start.txt를 string으로 load하기
             if let startWords = try? String(contentsOf: startWordsURL) {
                 //3. load한 string을 string배열로 바꾸기
-                wordsArray = startWords.components(separatedBy: "\n")
+                let allWords = startWords.components(separatedBy: "\n")
+                
+                //4. 랜덤 단어 뽑기, 배열이 비었을 경우 'silkworm'을 default값으로 주기
+                rootWord = allWords.randomElement() ?? "silkworm"
+                
+                //모든 과정이 완료됐으므로 빠져나가기
+                return
             }
         }
         
         //여기 왔다면 파일을 찾거나 로드하는 과정에 문제가 발생한 것
         fatalError("Could not load start.txt from bundle")
-    }
-    
-    func startGame() {
-        getWordsArray()
-        
-       //랜덤 단어 뽑기, 배열이 비었을 경우 'silkworm'을 default값으로 주기
-        rootWord = wordsArray.randomElement() ?? "silkworm"
     }
     
     func isOriginal(word: String) -> Bool {
@@ -141,12 +134,6 @@ struct ContentView: View {
         return true
     }
     
-    func wordLimit(word: String) -> Bool {
-        if word.count < 3 { return false }
-        if word == rootWord { return false }
-        return true
-    }
-    
     func isReal(word: String) -> Bool {
         //Swift string을 Objective-C string으로 바꾸려면
         
@@ -161,19 +148,19 @@ struct ContentView: View {
         return misspelledRange.location == NSNotFound
     }
     
+    func checkLength(word: String) -> Bool {
+        if word.count < 3 || word == rootWord { return false }
+        else { return true }
+    }
+    
     func wordError(title: String, message: String) {
         errorTitle = title
         errorMessage = message
         showingError = true
-    }
-    
-    func restartGame() {
-        usedWords.removeAll()
-        rootWord = wordsArray.randomElement() ?? "silkworm"
-        newWord = ""
     }
 }
 
 #Preview {
     ContentView()
 }
+
