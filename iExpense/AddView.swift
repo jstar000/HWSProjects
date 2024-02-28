@@ -12,6 +12,8 @@ struct AddView: View {
     @State private var type = "Personal"
     @State private var amount = 0.0
     
+    @Environment(\.dismiss) var dismiss
+    
     let types = ["Business", "Personal"]
     
     var expenses: Expenses
@@ -36,6 +38,9 @@ struct AddView: View {
                 Button("Save") {
                     let item = ExpenseItem(name: name, type: type, amount: amount)
                     expenses.items.append(item)
+                    dismiss()
+                    //-> dismiss()에서 @Environment로 선언된 dismiss 구조체를 함수처럼 사용하는 형태를 볼 수 있는데,
+                    //이는 dismiss 구조체 내에 callAsFunction이 구현되어있기 때문임
                 }
             }
         }
