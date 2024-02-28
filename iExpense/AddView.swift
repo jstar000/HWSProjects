@@ -32,6 +32,12 @@ struct AddView: View {
                 //문자열은 text: $__, 숫자는 value: $__
             }
             .navigationTitle("Add new expense")
+            .toolbar {
+                Button("Save") {
+                    let item = ExpenseItem(name: name, type: type, amount: amount)
+                    expenses.items.append(item)
+                }
+            }
         }
     }
 }
