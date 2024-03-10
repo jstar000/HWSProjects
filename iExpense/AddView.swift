@@ -14,6 +14,8 @@ struct AddView: View {
     
     @Environment(\.dismiss) var dismiss
     
+    let localCurrency = Locale.current.currency?.identifier ?? "USD"
+    
     let types = ["Business", "Personal"]
     
     var expenses: Expenses
@@ -29,7 +31,7 @@ struct AddView: View {
                     }
                 }
                 
-                TextField("Amount", value: $amount, format: .currency(code: "USD"))
+                TextField("Amount", value: $amount, format: .currency(code: localCurrency))
                     .keyboardType(.decimalPad)
                 //문자열은 text: $__, 숫자는 value: $__
             }
