@@ -21,7 +21,7 @@ struct ContentView: View {
                 LazyVGrid(columns: columns) {
                     ForEach(missions) { mission in
                         NavigationLink {
-                            Text("Detail View") //목적지 뷰
+                            MissionView(mission: mission, astronauts: astronauts)//목적지 뷰
                         } label: {
                             VStack {
                                 Image(mission.image)
@@ -44,7 +44,7 @@ struct ContentView: View {
                                 .frame(maxWidth: .infinity)
                                 .background(.lightBackground)
                             }
-                            .clipShape(.rect(cornerRadius: 10))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(.lightBackground)
