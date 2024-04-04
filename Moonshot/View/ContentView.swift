@@ -10,53 +10,35 @@ import SwiftUI
 struct ContentView: View {
     let astronauts: [String: Astronaut] = Bundle.main.decode("astronauts.json")
     let missions: [Mission] = Bundle.main.decode("missions.json")
-    
+
     let columns = [
         GridItem(.adaptive(minimum: 150))
     ]
+
+    @AppStorage("isViewStyleList") private var isViewStyleList = true
     
+    
+    
+    var currentStyle: String {
+        isViewStyleList ? "Change to Grid" : "Change to List"
+    }
+
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVGrid(columns: columns) {
-                    ForEach(missions) { mission in
-                        NavigationLink {
-                            MissionView(mission: mission, astronauts: astronauts)//목적지 뷰
-                        } label: {
-                            VStack {
-                                Image(mission.image)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 100, height: 100)
-                                    .padding()
-                                
-                                VStack {
-                                    Text(mission.displayName)
-                                        .font(.headline)
-                                        .foregroundStyle(.white)
-                                    Text(mission.formattedLaunchDate)
-                                        .font(.caption)
-                                        .foregroundStyle(.white.opacity(0.5))
-                                        //.opacity(0.5)
-                                        //어디에 opacity를 주든 똑같음
-                                }
-                                .padding(.vertical)
-                                .frame(maxWidth: .infinity)
-                                .background(.lightBackground)
-                            }
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(.lightBackground)
-                            )
-                        }
+            Group {
+                if isViewStyleList {
+                    ListView(astronauts: astronauts, missions: missions)
+                } else {
+                    GridView(astronauts: astronauts, missions: missions)
+                }
+            }
+            .toolbar {
+                ToolbarItem {
+                    Button(currentStyle) {
+                        isViewStyleList.toggle()
                     }
                 }
-                .padding([.horizontal, .bottom])
             }
-            .navigationTitle("Moonshot")
-            .background(.darkBackground)
-            .preferredColorScheme(.dark) //다크모드 강제
         }
     }
 }

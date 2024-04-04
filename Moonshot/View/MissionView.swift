@@ -119,6 +119,7 @@ struct MissionView: View {
         .navigationTitle(mission.displayName)
         .navigationBarTitleDisplayMode(.inline)
         .background(.darkBackground)
+        .preferredColorScheme(.dark)
     }
 }
 
