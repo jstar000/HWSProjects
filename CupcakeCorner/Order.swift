@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 @Observable
 class Order: Codable {
@@ -23,6 +24,15 @@ class Order: Codable {
         case _city = "city"
         case _streetAddress = "streetAddress"
         case _zip = "zip"
+    }
+    
+    init() {
+        if let savedName = UserDefaults.standard.data(forKey: "Name") {
+            if let decodedName = try? JSONDecoder().decode(String.self, from: savedName) {
+                name = decodedName
+                return
+            }
+        }
     }
     
     //ContentView
@@ -44,13 +54,31 @@ class Order: Codable {
     var addSprinkles = false
     
     //AddressView
-    var name = ""
-    var streetAddress = ""
-    var city = ""
-    var zip = ""
+    var name = "" {
+        didSet {
+            if let encoded = try? JSONEncoder().encode(name) {
+                UserDefaults.standard.set(encoded, forKey: "Name")
+            }
+        }
+    }
+    var streetAddress = "" {
+        didSet {
+            UserDefaults.standard.set(streetAddress, forKey: "StreetAddress")
+        }
+    }
+    var city = "" {
+        didSet {
+            UserDefaults.standard.set(city, forKey: "City")
+        }
+    }
+    var zip = "" {
+        didSet {
+            UserDefaults.standard.set(zip, forKey: "Zip")
+        }
+    }
     
     var hasValidAddress: Bool {
-        if name.isEmpty || streetAddress.isEmpty || city.isEmpty || zip.isEmpty {
+        if name.checkValidity() || streetAddress.checkValidity() || city.checkValidity() || zip.checkValidity() {
             return false
         }
         
@@ -76,5 +104,13 @@ class Order: Codable {
         }
         
         return cost
+    }
+}
+
+extension String {
+    func checkValidity() -> Bool {
+        self
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .isEmpty
     }
 }

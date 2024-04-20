@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+//UserDefaults에 값 저장하기
+//주소 didSet으로 저장하고 앱 실행될 때 불러오면 되는 거 아님?
+
 struct AddressView: View {
     @Bindable var order: Order
     
