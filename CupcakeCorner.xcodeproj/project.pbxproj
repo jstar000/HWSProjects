@@ -13,6 +13,7 @@
 		F86BEAF52BCEB84B002B382D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F86BEAF42BCEB84B002B382D /* Preview Assets.xcassets */; };
 		F8A862242BD254ED00AC3535 /* Order.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A862232BD254ED00AC3535 /* Order.swift */; };
 		F8A862262BD25B9100AC3535 /* AddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A862252BD25B9100AC3535 /* AddressView.swift */; };
+		F8A862282BD25F6300AC3535 /* CheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A862272BD25F6300AC3535 /* CheckoutView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +24,7 @@
 		F86BEAF42BCEB84B002B382D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		F8A862232BD254ED00AC3535 /* Order.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Order.swift; sourceTree = "<group>"; };
 		F8A862252BD25B9100AC3535 /* AddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressView.swift; sourceTree = "<group>"; };
+		F8A862272BD25F6300AC3535 /* CheckoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,9 +58,10 @@
 			isa = PBXGroup;
 			children = (
 				F86BEAED2BCEB849002B382D /* CupcakeCornerApp.swift */,
-				F8A862232BD254ED00AC3535 /* Order.swift */,
 				F86BEAEF2BCEB849002B382D /* ContentView.swift */,
 				F8A862252BD25B9100AC3535 /* AddressView.swift */,
+				F8A862272BD25F6300AC3535 /* CheckoutView.swift */,
+				F8A862232BD254ED00AC3535 /* Order.swift */,
 				F86BEAF12BCEB84B002B382D /* Assets.xcassets */,
 				F86BEAF32BCEB84B002B382D /* Preview Content */,
 			);
@@ -145,6 +148,7 @@
 			files = (
 				F8A862242BD254ED00AC3535 /* Order.swift in Sources */,
 				F8A862262BD25B9100AC3535 /* AddressView.swift in Sources */,
+				F8A862282BD25F6300AC3535 /* CheckoutView.swift in Sources */,
 				F86BEAF02BCEB849002B382D /* ContentView.swift in Sources */,
 				F86BEAEE2BCEB849002B382D /* CupcakeCornerApp.swift in Sources */,
 			);

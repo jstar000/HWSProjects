@@ -5,7 +5,7 @@
 //  Created by 임지성 on 4/16/24.
 //
 
-import CoreHaptics
+
 import SwiftUI
 
 struct ContentView: View {
