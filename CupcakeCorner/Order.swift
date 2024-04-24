@@ -27,12 +27,22 @@ class Order: Codable {
     }
     
     init() {
-        if let savedName = UserDefaults.standard.data(forKey: "Name") {
-            if let decodedName = try? JSONDecoder().decode(String.self, from: savedName) {
-                name = decodedName
-                return
-            }
-        }
+        //custom struct나 class같이 복잡한 타입인 경우에는 아래와 같이 encoding하면 되고,
+        //string같은 쉬운 타입인 경우에는 encoding decoding 필요 없는 듯 바로 불러오면 됨
+//        if let savedName = UserDefaults.standard.data(forKey: "Name") {
+//            if let decodedName = try? JSONDecoder().decode(String.self, from: savedName) {
+//                name = decodedName
+//                return
+//            }
+//        }
+        
+        //불러오는 값이 string, 걍 일반적인 타입이므로 encoding과 decoding 필요 없이 값을 바로
+        //불러올 수 있음. UserDefaults.standard. 까지 타이핑하면 string(forKey:), integer(forKey:),
+        //dictinary(forKey:) 등 지원되는 다양한 타입 확인 가능!
+        name = UserDefaults.standard.string(forKey: "Name") ?? ""
+        streetAddress = UserDefaults.standard.string(forKey: "StreetAddress") ?? ""
+        city = UserDefaults.standard.string(forKey: "City") ?? ""
+        zip = UserDefaults.standard.string(forKey: "Zip") ?? ""
     }
     
     //ContentView
@@ -56,9 +66,10 @@ class Order: Codable {
     //AddressView
     var name = "" {
         didSet {
-            if let encoded = try? JSONEncoder().encode(name) {
-                UserDefaults.standard.set(encoded, forKey: "Name")
-            }
+//            if let encoded = try? JSONEncoder().encode(name) {
+//                UserDefaults.standard.set(encoded, forKey: "Name")
+//            }
+            UserDefaults.standard.set(name, forKey: "Name")
         }
     }
     var streetAddress = "" {
@@ -78,7 +89,7 @@ class Order: Codable {
     }
     
     var hasValidAddress: Bool {
-        if name.checkValidity() || streetAddress.checkValidity() || city.checkValidity() || zip.checkValidity() {
+        if name.isReallyEmpty || streetAddress.isReallyEmpty || city.isReallyEmpty || zip.isReallyEmpty {
             return false
         }
         
@@ -104,13 +115,5 @@ class Order: Codable {
         }
         
         return cost
-    }
-}
-
-extension String {
-    func checkValidity() -> Bool {
-        self
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .isEmpty
     }
 }
