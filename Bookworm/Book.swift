@@ -15,6 +15,16 @@ class Book {
     var genre: String
     var review: String
     var rating: Int
+    var isRating1: Bool {
+        if rating == 1 {
+            return true
+        }
+        return false
+    }
+    var date = Date.now
+    var formattedDate: String {
+        date.formatted(date: .abbreviated, time: .omitted)
+    }
     
     init(title: String, author: String, genre: String, review: String, rating: Int) {
         self.title = title

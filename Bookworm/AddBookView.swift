@@ -19,6 +19,7 @@ struct AddBookView: View {
     @State private var genre = "Fantasy"
     @State private var review = ""
     
+    
     let genres = ["Fantasy", "Horror", "Kids", "Mystery", "Poetry", "Romance", "Thriller"]
 
     var body: some View {
@@ -46,10 +47,25 @@ struct AddBookView: View {
                         modelContext.insert(newBook)
                         dismiss()
                     }
+                    .disabled(hasValidForm() == false)
                 }
             }
             .navigationTitle("Add Book")
         }
+    }
+    
+    func hasValidForm() -> Bool {
+        if title.isReallyEmpty || author.isReallyEmpty || review.isReallyEmpty {
+            return false
+        }
+        
+        return true
+    }
+}
+
+extension String {
+    var isReallyEmpty: Bool {
+        self.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }
 
