@@ -14,6 +14,8 @@ import SwiftUI
 struct ContentView: View {
     @State private var processedImage: Image?
     @State private var filterIntensity = 0.5
+    @State private var filterRadius = 10.0
+    @State private var filterScale = 5.0
     
     @State private var selectedItem: PhotosPickerItem?
     
@@ -46,22 +48,46 @@ struct ContentView: View {
                 // Spacer()를 두 개 사용함으로써 이미지 공간을 확보하고 슬라이더와 버튼을
                 // 화면 최하단에 고정시킴
                 
-                HStack {
-                    Text("Intensity")
-                    Slider(value: $filterIntensity)
-                        .onChange(of: filterIntensity, applyProcessing)
-                    // slider에 value파라미터만 넘기면 슬라이더 값이 범위는 0부터 1까지, 현재 값은 0.5로 초기화됨
+                VStack {
+                    if currentFilter.inputKeys.contains(kCIInputIntensityKey) {
+                        HStack {
+                            Text("Intensity")
+                            Slider(value: $filterIntensity)
+                                .onChange(of: filterIntensity, applyProcessing)
+                            // slider에 value파라미터만 넘기면 슬라이더 값이 범위는 0부터 1까지, 현재 값은 0.5로 초기화됨
+                        }
+                        .disabled(processedImage == nil)
+                    }
+                    
+                    if currentFilter.inputKeys.contains(kCIInputRadiusKey) {
+                        HStack {
+                            Text("Radius")
+                            Slider(value: $filterRadius, in: 0 ... 200)
+                                .onChange(of: filterRadius, applyProcessing)
+                        }
+                        .disabled(processedImage == nil)
+                    }
+                    
+                    if currentFilter.inputKeys.contains(kCIInputScaleKey) {
+                        HStack {
+                            Text("Scale")
+                            Slider(value: $filterScale, in: 0 ... 10)
+                                .onChange(of: filterScale, applyProcessing)
+                        }
+                        .disabled(processedImage == nil)
+                    }
                 }
                 .padding(.vertical)
                 
                 HStack {
                     Button("Change Filter", action: changeFilter)
+                        .disabled(processedImage == nil)
                     // 함수가 간단하더라도 이렇게 버튼의 action을 함수에 분리하는 게 clean code!
                     
                     Spacer()
                     
                     if let processedImage {
-                        ShareLink(item: processedImage, preview: SharePreview("Instafilter image", image: processedImage))
+                        ShareLink(item: processedImage, preview: SharePreview("Instafilter Image", image: processedImage))
                     }
                 }
             }
@@ -75,7 +101,11 @@ struct ContentView: View {
                 Button("Sepia Tone") { setFilter(CIFilter.sepiaTone()) }
                 Button("Unsharp Mask") { setFilter(CIFilter.unsharpMask()) }
                 Button("Vignette") { setFilter(CIFilter.vignette()) }
+                Button("Noir") { setFilter(CIFilter.photoEffectNoir())}
+                Button("Pointillize") { setFilter(CIFilter.pointillize())}
+                Button("Bloom") { setFilter(CIFilter.bloom())}
                 Button("Cancel", role: .cancel) { }
+                // confirmation dialog는 선택지가 너무 많은 경우 비효율적. 이런 경우 Menu-style picker가 나음!
             }
         }
     }
@@ -105,8 +135,8 @@ struct ContentView: View {
         let inputKeys = currentFilter.inputKeys
         
         if inputKeys.contains(kCIInputIntensityKey) { currentFilter.setValue(filterIntensity, forKey: kCIInputIntensityKey) }
-        if inputKeys.contains(kCIInputRadiusKey) { currentFilter.setValue(filterIntensity * 200, forKey: kCIInputRadiusKey) }
-        if inputKeys.contains(kCIInputScaleKey) { currentFilter.setValue(filterIntensity * 10, forKey: kCIInputScaleKey) }
+        if inputKeys.contains(kCIInputRadiusKey) { currentFilter.setValue(filterRadius, forKey: kCIInputRadiusKey) }
+        if inputKeys.contains(kCIInputScaleKey) { currentFilter.setValue(filterScale, forKey: kCIInputScaleKey) }
         // filterIntensity에 특정 숫자를 곱한 이유는 필터에 적절한 범위의 값을 전달하기 위함임
         // (+) default slider의 범위는 0부터 1까지임
         
