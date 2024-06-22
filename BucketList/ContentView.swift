@@ -18,6 +18,7 @@ struct ContentView: View {
     )
     
     @State private var locations = [Location]()
+    @State private var selectedPlace: Location?
     
     var body: some View {
         MapReader { proxy in
@@ -30,6 +31,9 @@ struct ContentView: View {
                             .frame(width: 44, height: 44)
                             .background(.white)
                             .clipShape(.circle)
+                            .onLongPressGesture {
+                                 selectedPlace = location
+                            }
                     }
                 }
             }
@@ -40,6 +44,13 @@ struct ContentView: View {
                     // local은 화면 전체가 아니라 'Map뷰' 내에서의 좌표를 뜻함
                     let newLocation = Location(id: UUID(), name: "New Location", description: "", latitude: coordinate.latitude, longitude: coordinate.longitude)
                     locations.append(newLocation)
+                }
+            }
+            .sheet(item: $selectedPlace) { place in
+                EditView(location: place) { newLocation in
+                    if let index = locations.firstIndex(of: place) {
+                        locations[index] = newLocation
+                    }
                 }
             }
         }
