@@ -1,0 +1,22 @@
+disabled_rules: # Default Rules에서 비활성화할 규칙
+
+    # 라인 뒤에 공백이 없어야 합니다.
+    - trailing_whitespace
+    
+    # 강제 캐스팅은 피해야합니다.
+    - force_cast
+    
+    # 강제 언래핑은 피해야합니다.
+    - force_unwrapping
+    
+    # 한 줄의 길이를 제한합니다.
+    - line_length
+    
+opt_in_rules:
+
+    # Imports should be sorted
+    - sorted_imports
+    
+identifier_name:
+  min_length: 1 # 최소 길이를 1로 설정
+  max_length: 40 # 최대 길이 설정
