@@ -68,6 +68,7 @@
 				F8F835832C285F4900A33935 /* Result.swift */,
 				F8F835632C265B1200A33935 /* EditView.swift */,
 				F8F835612C231C5300A33935 /* Location.swift */,
+				F8F835832C285F4900A33935 /* Result.swift */,
 				F870E3A72C1BDE2E00AB28A6 /* Assets.xcassets */,
 				F870E3A92C1BDE2E00AB28A6 /* Preview Content */,
 			);
